@@ -1,0 +1,28 @@
+name: Close inactive issues - VI-NEX-AI
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Cambiar a las 2:00 AM UTC
+  workflow_dispatch:  # Añadir ejecución manual
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 14  # Aumentar a 14 días para proyectos de investigación
+          days-before-issue-close: 7   # 7 días después de marcar como stale
+          stale-issue-label: "stale"
+          stale-issue-message: |
+            Este issue ha sido marcado como inactivo porque no ha tenido actividad en 14 días.
+            Si estás trabajando en VI-NEX-AI y este issue sigue siendo relevante, por favor comenta para mantenerlo activo.
+          close-issue-message: |
+            Este issue fue cerrado automáticamente por inactividad (21 días sin actividad).
+            Si consideras que es importante para VI-NEX-AI, puedes reabrir el issue.
+          exempt-issue-labels: "bug,enhancement,help wanted,documentation"  # No cerrar issues importantes
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

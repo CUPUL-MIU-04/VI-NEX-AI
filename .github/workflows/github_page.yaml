@@ -1,0 +1,56 @@
+name: Deploy VI-NEX-AI Documentation & Demos
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, develop ]
+    paths: [ 'docs/**', 'gradio/**', 'assets/**' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    concurrency:
+      group: "pages-${{ github.ref }}"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: main  # Cambiar a la rama principal de VI-NEX-AI
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install gradio mkdocs-material
+        
+    - name: Build documentation
+      run: |
+        # Construir documentación para VI-NEX-AI
+        mkdocs build --site-dir public
+        
+    - name: Build Gradio demo
+      run: |
+        python gradio/app.py --build-only
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: './public'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
