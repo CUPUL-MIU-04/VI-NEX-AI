@@ -1,64 +1,64 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
-import requests
+import uvicorn
 
-app = FastAPI(title="VI-NEX-AI API")
+app = FastAPI(title="VI-NEX-AI API", version="1.0.0")
 
-# Configuración desde secrets
-VI_NEX_API_TOKENS = os.getenv("VI_NEX_API_TOKENS", "").split(",")
-GITHUB_TOKEN = os.getenv("VI_NEX_API_TOKEN")  # Tu fine-grained token
+# Configuración CORS para Netlify
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://vi-nex-ai.netlify.app/",  # Cambia por tu dominio Netlify
+        "*"  # Temporalmente permite todos, luego restringe
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-async def verify_api_key(api_key: str = Header(..., alias="X-API-Key")):
-    """Verifica las API keys de usuarios"""
-    if api_key not in VI_NEX_API_TOKENS:
+# API Keys de usuarios
+USER_API_KEYS = os.getenv("USER_API_KEYS", "test_key_123,demo_key_456").split(",")
+
+class VideoRequest(BaseModel):
+    prompt: str
+    config: str = "vi_nex_512px.py"
+    style: str = "default"
+
+async def verify_api_key(x_api_key: str = Header(...)):
+    if x_api_key not in USER_API_KEYS:
         raise HTTPException(status_code=403, detail="Invalid API Key")
-    return api_key
-
-def verify_github_access():
-    """Verifica acceso al repositorio usando el fine-grained token"""
-    if not GITHUB_TOKEN:
-        return False
-    
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-    
-    try:
-        response = requests.get(
-            "https://api.github.com/repos/CUPUL-MIU-04/VI-NEX-AI",
-            headers=headers
-        )
-        return response.status_code == 200
-    except:
-        return False
+    return x_api_key
 
 @app.post("/generate-video")
-async def generate_video(
-    prompt: str,
-    config: str = "vi_nex_512px.py",
-    api_key: str = Depends(verify_api_key)
-):
-    # Verificar acceso a GitHub
-    if not verify_github_access():
-        raise HTTPException(
-            status_code=500, 
-            detail="GitHub access not configured properly"
-        )
+async def generate_video(request: VideoRequest, api_key: str = Header(...)):
+    # Simulación - aquí integrarás tu modelo VI-NEX-AI real
+    import time
+    import uuid
     
-    # Tu lógica de generación de video aquí
+    job_id = str(uuid.uuid4())[:8]
+    
     return {
-        "status": "success", 
-        "message": "Video generation started",
-        "config": config
+        "job_id": job_id,
+        "status": "processing", 
+        "message": f"Video generation started for: {request.prompt}",
+        "config": request.config
     }
 
-@app.get("/system/health")
-async def health_check():
-    github_access = verify_github_access()
+@app.get("/health")
+async def health_check(api_key: str = Header(...)):
     return {
-        "status": "healthy",
-        "github_access": github_access,
-        "service": "VI-NEX-AI"
+        "status": "healthy", 
+        "service": "VI-NEX-AI",
+        "version": "1.0.0"
     }
+
+@app.get("/")
+async def root():
+    return {"message": "VI-NEX-AI API is running"}
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
