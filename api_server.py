@@ -1,13 +1,11 @@
-from fastapi import FastAPI, HTTPException
+# api_server.py
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import os
 import uvicorn
-import uuid
 
 app = FastAPI(title="VI-NEX-AI API", version="1.0.0")
 
-# Configuración CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,51 +14,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API Keys
-USER_API_KEYS = os.getenv("USER_API_KEYS", "test_key_123,demo_key_456").split(",")
+USER_API_KEYS = os.getenv("USER_API_KEYS", "test_key_123").split(",")
 
-class VideoRequest(BaseModel):
-    prompt: str
-    config: str = "vi_nex_512px.py"
-    style: str = "default"
-
-def verify_api_key(x_api_key: str):
+async def verify_api_key(x_api_key: str = Header(...)):
     if x_api_key not in USER_API_KEYS:
         raise HTTPException(status_code=403, detail="Invalid API Key")
-    return True
+    return x_api_key
 
 @app.post("/generate-video")
-async def generate_video(request: VideoRequest, x_api_key: str):
-    """Endpoint simulado para generación de video"""
-    verify_api_key(x_api_key)
-    
-    job_id = str(uuid.uuid4())[:8]
-    
+async def generate_video(prompt: str, api_key: str = Header(...)):
     return {
-        "job_id": job_id,
-        "status": "processing", 
-        "message": f"Video simulation started for: {request.prompt}",
-        "config": request.config,
-        "note": "API running on Render.com - Ready for VI-NEX-AI integration"
+        "job_id": "demo_123",
+        "status": "success", 
+        "message": f"Video simulation: {prompt}",
+        "note": "API is working! Integrate your VI-NEX-AI model here."
     }
 
 @app.get("/health")
-async def health_check(x_api_key: str):
-    verify_api_key(x_api_key)
-    return {
-        "status": "healthy", 
-        "service": "VI-NEX-AI API",
-        "version": "1.0.0",
-        "environment": "render.com"
-    }
+async def health_check(api_key: str = Header(...)):
+    return {"status": "healthy", "service": "VI-NEX-AI"}
 
 @app.get("/")
 async def root():
-    return {
-        "message": "VI-NEX-AI API is running successfully on Render.com!",
-        "docs": "/docs",
-        "health": "/health"
-    }
+    return {"message": "VI-NEX-AI API Running on Render"}
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
