@@ -1,19 +1,16 @@
-# Core API
+# requirements-optimized.txt
 fastapi==0.104.1
-uvicorn==0.24.0
+uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 requests==2.31.0
 python-dotenv==1.0.0
-pydantic==2.5.0
 
-# PyTorch para Python 3.13 (versiones MÁS NUEVAS)
-torch==2.9.1
-torchvision==0.20.1
-torchaudio==2.9.1
+# Dependencias directas de FastAPI (evitar compilación)
+anyio==3.7.1
+starlette==0.27.0
+typing-extensions==4.8.0
+click==8.1.7
+h11==0.14.0
 
-# Solo dependencias CRÍTICAS para API
-transformers==4.41.2
-accelerate==0.32.1
-numpy==1.26.4
-Pillow==10.4.0
-opencv-python==4.10.0.84
+# Pydantic sin compilación
+pydantic==1.10.12  # ← Versión anterior que no requiere pydantic-core
