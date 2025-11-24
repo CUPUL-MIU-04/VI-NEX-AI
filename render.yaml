@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: vi-nex-ai-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api_server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: USER_API_KEYS
+        value: test_key_123,user_key_456,admin_key_789
