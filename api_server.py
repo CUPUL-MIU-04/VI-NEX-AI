@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel  # Compatible con v1.10.13
+from pydantic import BaseModel
 import os
 import uvicorn
 import uuid
@@ -24,14 +24,16 @@ class VideoRequest(BaseModel):
     config: str = "vi_nex_512px.py"
     style: str = "default"
 
-async def verify_api_key(x_api_key: str = Header(...)):
+def verify_api_key(x_api_key: str):
     if x_api_key not in USER_API_KEYS:
         raise HTTPException(status_code=403, detail="Invalid API Key")
-    return x_api_key
+    return True
 
 @app.post("/generate-video")
-async def generate_video(request: VideoRequest, api_key: str = Header(...)):
+async def generate_video(request: VideoRequest, x_api_key: str):
     """Endpoint simulado para generación de video"""
+    verify_api_key(x_api_key)
+    
     job_id = str(uuid.uuid4())[:8]
     
     return {
@@ -43,7 +45,8 @@ async def generate_video(request: VideoRequest, api_key: str = Header(...)):
     }
 
 @app.get("/health")
-async def health_check(api_key: str = Header(...)):
+async def health_check(x_api_key: str):
+    verify_api_key(x_api_key)
     return {
         "status": "healthy", 
         "service": "VI-NEX-AI API",
