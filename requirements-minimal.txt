@@ -1,7 +1,7 @@
-# ABSOLUTE MINIMAL - Solo API, sin PyTorch
+# VERSIÓN COMPATIBLE CON PYTHON 3.10
 fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 requests==2.31.0
 python-dotenv==1.0.0
-pydantic==1.10.13
+pydantic==2.5.0
