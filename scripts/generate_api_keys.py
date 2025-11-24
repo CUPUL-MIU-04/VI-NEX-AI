@@ -1,64 +1,32 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
-from fastapi.middleware.cors import CORSMiddleware
-import os
-import requests
+import secrets
+import hashlib
+import json
+from datetime import datetime, timedelta
 
-app = FastAPI(title="VI-NEX-AI API")
-
-# Configuración desde secrets
-VI_NEX_API_TOKENS = os.getenv("VI_NEX_API_TOKENS", "").split(",")
-GITHUB_TOKEN = os.getenv("VI_NEX_API_TOKEN")  # Tu fine-grained token
-
-async def verify_api_key(api_key: str = Header(..., alias="X-API-Key")):
-    """Verifica las API keys de usuarios"""
-    if api_key not in VI_NEX_API_TOKENS:
-        raise HTTPException(status_code=403, detail="Invalid API Key")
-    return api_key
-
-def verify_github_access():
-    """Verifica acceso al repositorio usando el fine-grained token"""
-    if not GITHUB_TOKEN:
-        return False
+def generate_user_api_key(user_id: str, expires_days: int = 90):
+    """Genera API keys seguras para usuarios"""
     
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
+    # Generar token seguro
+    raw_token = secrets.token_urlsafe(32)
+    
+    # Crear hash para almacenar (nunca almacenes el token plano)
+    token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+    
+    api_key_info = {
+        "user_id": user_id,
+        "token_hash": token_hash,
+        "created_at": datetime.now().isoformat(),
+        "expires_at": (datetime.now() + timedelta(days=expires_days)).isoformat(),
+        "permissions": ["video_generate", "video_download"]
     }
     
-    try:
-        response = requests.get(
-            "https://api.github.com/repos/CUPUL-MIU-04/VI-NEX-AI",
-            headers=headers
-        )
-        return response.status_code == 200
-    except:
-        return False
-
-@app.post("/generate-video")
-async def generate_video(
-    prompt: str,
-    config: str = "vi_nex_512px.py",
-    api_key: str = Depends(verify_api_key)
-):
-    # Verificar acceso a GitHub
-    if not verify_github_access():
-        raise HTTPException(
-            status_code=500, 
-            detail="GitHub access not configured properly"
-        )
+    print(f"✅ API Key generada para {user_id}:")
+    print(f"🔑 Token: {raw_token}")
+    print(f"📅 Expira: {api_key_info['expires_at']}")
+    print("⚠️  GUARDA ESTE TOKEN - NO SE PODRÁ RECUPERAR")
     
-    # Tu lógica de generación de video aquí
-    return {
-        "status": "success", 
-        "message": "Video generation started",
-        "config": config
-    }
+    return raw_token, api_key_info
 
-@app.get("/system/health")
-async def health_check():
-    github_access = verify_github_access()
-    return {
-        "status": "healthy",
-        "github_access": github_access,
-        "service": "VI-NEX-AI"
-      }
+if __name__ == "__main__":
+    user_id = input("Ingresa el ID de usuario: ")
+    generate_user_api_key(user_id)
