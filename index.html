@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VI-NEX-AI - Generador de Videos con IA</title>
+    <meta name="description" content="Genera videos increíbles con inteligencia artificial VI-NEX-AI">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 VI-NEX-AI</h1>
+            <p>Generador de Videos con Inteligencia Artificial</p>
+        </header>
+
+        <div class="api-section">
+            <div class="form-group">
+                <label for="apiKey">🔑 Tu API Key:</label>
+                <input type="password" id="apiKey" placeholder="Ingresa la API Key proporcionada">
+                <button onclick="testAPIKey()">Verificar API Key</button>
+            </div>
+            <div id="apiStatus" class="status-box"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="prompt">📝 Descripción del Video:</label>
+            <textarea id="prompt" placeholder="Ej: Un paisaje montañoso al atardecer con nubes coloridas y un río cristalino..."></textarea>
+        </div>
+
+        <div class="controls-grid">
+            <div class="form-group">
+                <label for="resolution">🖼️ Resolución:</label>
+                <select id="resolution">
+                    <option value="vi_nex_512px.py">512px - Balanceado</option>
+                    <option value="vi_nex_768px.py">768px - Alta Calidad</option>
+                    <option value="vi_nex_1024px.py">1024px <span class="feature-badge">HD</span></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="style">🎨 Estilo:</label>
+                <select id="style">
+                    <option value="default">Predeterminado</option>
+                    <option value="vi_nex_anime">Anime</option>
+                    <option value="vi_nex_animation">Animación</option>
+                    <option value="vi_nex_3d_hyper_real">3D Hiperrealista</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="generateVideo()" id="generateBtn">🚀 Generar Video</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generando tu video... Esto puede tomar varios minutos.</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div id="jobStatus" class="status-box status-info"></div>
+            
+            <div class="video-preview" id="videoPreview">
+                <div id="placeholderText">
+                    Tu video generado aparecerá aquí
+                </div>
+                <video id="generatedVideo" controls style="display: none;"></video>
+            </div>
+            
+            <button onclick="downloadVideo()" class="download-btn" id="downloadBtn">
+                💾 Descargar Video
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
