@@ -1,7 +1,16 @@
-# VERSIÓN COMPATIBLE CON PYTHON 3.10
+# requirements-minimal.txt - SOLO WHEELS PRECOMPILADOS
 fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 requests==2.31.0
 python-dotenv==1.0.0
 pydantic==2.5.0
+
+# Especifica VERSIÓN ESPECÍFICA de pydantic-core con wheel precompilado
+pydantic-core==2.14.1 --only-binary=all
+
+# Añade estas dependencias básicas que FastAPI necesita
+anyio==3.7.1
+starlette==0.27.0
+typing-extensions==4.8.0
+click==8.1.7
