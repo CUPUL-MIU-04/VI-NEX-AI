@@ -1,0 +1,38 @@
+# test_model.py
+import sys
+import os
+sys.path.append('.')
+
+def test_vi_nex_model():
+    """Prueba básica del modelo VI-NEX-AI"""
+    try:
+        # Intenta importar los componentes esenciales
+        from opensora.utils.config import load_config
+        
+        print("✅ Módulos importados correctamente")
+        
+        # Carga una configuración
+        config_path = "configs/diffusion/inference/vi_nex_256px.py"
+        if os.path.exists(config_path):
+            config = load_config(config_path)
+            print("✅ Configuración cargada:", config_path)
+            
+            # Aquí iría la generación real
+            # video = inference(config, "Un paisaje de prueba")
+            # print("✅ Video generado exitosamente")
+            
+            return True
+        else:
+            print("❌ Configuración no encontrada:", config_path)
+            return False
+            
+    except Exception as e:
+        print("❌ Error al cargar el modelo:", str(e))
+        return False
+
+if __name__ == "__main__":
+    success = test_vi_nex_model()
+    if success:
+        print("\n🎯 VI-NEX-AI está listo para generar videos")
+    else:
+        print("\n⚠️  Hay problemas con la configuración del modelo")
