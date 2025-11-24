@@ -1,10 +1,9 @@
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel  # Compatible con v1.10.13
 import os
 import uvicorn
 import uuid
-import json
 
 app = FastAPI(title="VI-NEX-AI API", version="1.0.0")
 
@@ -32,26 +31,16 @@ async def verify_api_key(x_api_key: str = Header(...)):
 
 @app.post("/generate-video")
 async def generate_video(request: VideoRequest, api_key: str = Header(...)):
-    """
-    Endpoint simulado para generación de video
-    En producción, aquí integrarías tu modelo VI-NEX-AI
-    """
-    try:
-        job_id = str(uuid.uuid4())[:8]
-        
-        # Simulación de generación - EN PRODUCCIÓN AQUÍ IRÍA TU MODELO REAL
-        print(f"🔮 Simulando generación para: {request.prompt}")
-        
-        return {
-            "job_id": job_id,
-            "status": "processing", 
-            "message": f"Video simulation started for: {request.prompt}",
-            "config": request.config,
-            "note": "This is a simulation. Integrate your VI-NEX-AI model here."
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+    """Endpoint simulado para generación de video"""
+    job_id = str(uuid.uuid4())[:8]
+    
+    return {
+        "job_id": job_id,
+        "status": "processing", 
+        "message": f"Video simulation started for: {request.prompt}",
+        "config": request.config,
+        "note": "API running on Render.com - Ready for VI-NEX-AI integration"
+    }
 
 @app.get("/health")
 async def health_check(api_key: str = Header(...)):
@@ -65,7 +54,7 @@ async def health_check(api_key: str = Header(...)):
 @app.get("/")
 async def root():
     return {
-        "message": "VI-NEX-AI API is running on Render.com",
+        "message": "VI-NEX-AI API is running successfully on Render.com!",
         "docs": "/docs",
         "health": "/health"
     }
