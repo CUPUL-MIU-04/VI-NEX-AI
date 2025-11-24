@@ -1,6 +1,6 @@
 // ================= CONFIGURACIÓN =================
 // IMPORTANTE: Cambia esta URL por tu API real cuando la despliegues
-const API_BASE_URL = "https://tu-api-vi-nex-ai.herokuapp.com";
+const API_BASE_URL = "https://vi-nex-ai.onrender.com";
 
 // Variables globales
 let currentJobId = null;
