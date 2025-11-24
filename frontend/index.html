@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VI-NEX-AI - Generador de Videos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 VI-NEX-AI</h1>
+            <p>Generador de Videos con IA</p>
+        </header>
+
+        <div class="api-section">
+            <input type="password" id="apiKey" placeholder="🔑 Ingresa tu API Key">
+            <button onclick="testAPIKey()">Verificar API Key</button>
+            <div id="apiStatus"></div>
+        </div>
+
+        <div class="video-form">
+            <textarea id="prompt" placeholder="📝 Describe tu video..."></textarea>
+            
+            <div class="controls">
+                <select id="resolution">
+                    <option value="vi_nex_512px.py">512px - Balanceado</option>
+                    <option value="vi_nex_1024px.py">1024px - Alta Calidad</option>
+                </select>
+                
+                <button onclick="generateVideo()" id="generateBtn">🚀 Generar Video</button>
+            </div>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
