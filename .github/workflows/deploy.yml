@@ -1,13 +1,11 @@
-name: Deploy VI-NEX-AI API
+name: Deploy VI-NEX-AI to Render
 
 on:
   push:
     branches: [ main, master ]
-  release:
-    types: [ published ]
 
 jobs:
-  deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
     environment: production
     
@@ -25,27 +23,28 @@ jobs:
         pip install -r requirements.txt
         pip install fastapi uvicorn python-multipart
         
-    - name: Deploy to server
-      env:
-        VI_NEX_API_TOKEN: ${{ secrets.VI_NEX_API_TOKEN }}
-        DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+    - name: Run tests
       run: |
-        echo "Desplegando VI-NEX-AI..."
-        echo "DEPLOY_URL: $DEPLOY_URL"
+        # Aquí tus comandos de test
+        echo "Running tests..."
         
-        # Verificar que las variables no estén vacías
-        if [ -z "$DEPLOY_URL" ]; then
-          echo "ERROR: DEPLOY_URL está vacía"
+    - name: Deploy to Render using Deploy Hook
+      env:
+        DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_URL }}
+      run: |
+        echo "🚀 Desplegando VI-NEX-AI en Render..."
+        echo "Deploy Hook URL: $([ ! -z "$DEPLOY_HOOK_URL" ] && echo "✅ Configurada" || echo "❌ No configurada")"
+        
+        if [ -z "$DEPLOY_HOOK_URL" ]; then
+          echo "❌ ERROR: DEPLOY_URL no configurada"
+          echo "📝 Configura el secret DEPLOY_URL con el Deploy Hook de Render:"
+          echo "1. Ve a tu servicio en Render"
+          echo "2. Settings → Deploy Hook"
+          echo "3. Copia la URL del Deploy Hook"
+          echo "4. Agrégalo en GitHub Secrets como DEPLOY_URL"
           exit 1
         fi
         
-        if [ -z "$VI_NEX_API_TOKEN" ]; then
-          echo "ERROR: VI_NEX_API_TOKEN está vacía"
-          exit 1
-        fi
-        
-        # Hacer el deploy - ajusta según tu proveedor
-        curl -X POST "$DEPLOY_URL" \
-          -H "Authorization: Bearer $VI_NEX_API_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d '{"ref": "main"}'
+        echo "✅ Triggering deployment via Deploy Hook..."
+        curl -X POST "$DEPLOY_HOOK_URL"
+        echo "🎉 ¡Deploy triggered! Verifica el progreso en https://dashboard.render.com/"
