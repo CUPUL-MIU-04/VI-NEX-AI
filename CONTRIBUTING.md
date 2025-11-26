@@ -14,7 +14,7 @@ You can refer to the Installation Section and replace pip install -v . with pip 
 
 ```bash
 # Clone the repository
-git clone https://github.com/<YOUR-USERNAME>/VI-NEX-AI.git
+git clone https://github.com/Cupul-miu-04/VI-NEX-AI.git
 cd VI-NEX-AI
 
 # Create and activate virtual environment
@@ -51,7 +51,7 @@ Firstly, you need to visit the VI-NEX-AI repository and fork into your own accou
 Now, you can clone your own forked repository into your local environment.
 
 ```shell
-git clone https://github.com/<YOUR-USERNAME>/VI-NEX-AI.git
+git clone https://github.com/Cupul-miu-04/VI-NEX-AI.git
 ```
 
 ## 2. Configure Git
@@ -62,7 +62,7 @@ Then add the original repository as upstream
 
 ```shell
 cd VI-NEX-AI
-git remote add upstream https://github.com/VI-NEX-AI/VI-NEX-AI.git
+git remote add upstream https://github.com/Cupul-miu-04/VI-NEX-AI.git
 ```
 
 you can use the following command to verify that the remote is set. You should see both origin and upstream in the output.
