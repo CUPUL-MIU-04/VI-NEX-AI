@@ -1,16 +1,17 @@
-# requirements-optimized.txt
+# requirements.txt
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 requests==2.31.0
 python-dotenv==1.0.0
+jinja2==3.1.2  # ← AÑADE ESTA LÍNEA
 
-# Dependencias directas de FastAPI (evitar compilación)
+# Dependencias directas de FastAPI
 anyio==3.7.1
 starlette==0.27.0
 typing-extensions==4.8.0
 click==8.1.7
 h11==0.14.0
 
-# Pydantic sin compilación
-pydantic==1.10.12  # ← Versión anterior que no requiere pydantic-core
+# Pydantic
+pydantic==1.10.12
