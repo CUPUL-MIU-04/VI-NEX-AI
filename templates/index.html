@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VI-NEX-AI - Generador de Video</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .form-section, .result-section {
+            background: #f9fafb;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .config-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .config-item.selected {
+            border-color: #6366f1;
+            background: #e0e7ff;
+        }
+        
+        .api-key-info {
+            background: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 VI-NEX-AI Video Generator</h1>
+            <p>Potenciado por tu modelo modificado de Open-Sora</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <div class="api-key-info">
+                    <strong>🔑 API Key:</strong> Usa <code>demo_key_123456</code> para probar
+                </div>
+
+                <div class="form-group">
+                    <label for="prompt">✨ Describe tu video</label>
+                    <textarea 
+                        id="prompt" 
+                        placeholder="Ej: Un astronauta cabalgando un caballo galopante en el espacio profundo, nebulosas coloridas de fondo, estilo cinematográfico 4K..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="configSelect">⚙️ Configuración de calidad</label>
+                    <select id="configSelect" class="form-control">
+                        <option value="vi_nex_512px.py">VI-NEX 512px (Recomendado)</option>
+                        <option value="256px.py">256px (Rápido)</option>
+                        <option value="768px.py">768px (Alta calidad)</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="generateVideo()" id="generateBtn">
+                    <span id="btnText">🚀 Generar Video</span>
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <h3>Procesando tu video...</h3>
+                    <p>Esta operación puede tomar de 2 a 5 minutos.</p>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2>🎥 Resultado del Video</h2>
+                <div id="result">
+                    <div style="text-align: center; color: #6b7280; padding: 60px 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🎬</div>
+                        <h3>Tu video aparecerá aquí</h3>
+                        <p>Describe tu idea y haz clic en "Generar Video"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://vi-nex-ai.onrender.com';
+        let currentJobId = null;
+        let statusCheckInterval = null;
+
+        async function generateVideo() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const config = document.getElementById('configSelect').value;
+            const generateBtn = document.getElementById('generateBtn');
+            const btnText = document.getElementById('btnText');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            if (!prompt) {
+                alert('Por favor describe el video que quieres generar');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            btnText.textContent = '⏳ Iniciando...';
+            loading.style.display = 'block';
+            result.innerHTML = '<div style="text-align: center;"><div class="spinner"></div><h3>Iniciando generación...</h3></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        api_key: 'demo_key_123456',
+                        config: config
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentJobId = data.job_id;
+                    startStatusChecking();
+                } else {
+                    throw new Error(data.detail || 'Error al generar video');
+                }
+            } catch (error) {
+                showError(error.message);
+                resetUI();
+            }
+        }
+
+        function startStatusChecking() {
+            statusCheckInterval = setInterval(checkJobStatus, 3000);
+        }
+
+        async function checkJobStatus() {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/status/${currentJobId}`);
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    clearInterval(statusCheckInterval);
+                    showVideoResult(data);
+                    resetUI();
+                } else if (data.status === 'failed') {
+                    clearInterval(statusCheckInterval);
+                    showError(data.error);
+                    resetUI();
+                } else {
+                    updateProgress(data);
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        function showVideoResult(data) {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #10b981; margin-bottom: 20px;">✅ ¡Video Generado Exitosamente!</h3>
+                    <div class="video-container">
+                        <video controls autoplay muted style="max-width: 100%; border-radius: 10px;">
+                            <source src="${API_BASE_URL}${data.video_url}" type="video/mp4">
+                            Tu navegador no soporta el elemento video.
+                        </video>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <a href="${API_BASE_URL}${data.video_url}" download class="btn" style="display: inline-block; width: auto; margin: 5px;">
+                            📥 Descargar Video
+                        </a>
+                        <button onclick="location.reload()" class="btn" style="display: inline-block; width: auto; margin: 5px; background: linear-gradient(135deg, #10b981, #059669);">
+                            🎬 Generar Otro
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateProgress(data) {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div style="text-align: center; color: #f59e0b;">
+                    <div class="spinner" style="border-top-color: #f59e0b;"></div>
+                    <h3>🔄 Generando video...</h3>
+                    <p>${data.message}</p>
+                    <p><small>Tiempo transcurrido: ${data.elapsed_seconds || 0} segundos</small></p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div style="color: #ef4444; text-align: center; padding: 30px;">
+                    <h3>❌ Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function resetUI() {
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('btnText').textContent = '🚀 Generar Video';
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Permitir Ctrl+Enter para generar
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateVideo();
+            }
+        });
+    </script>
+</body>
+</html>
